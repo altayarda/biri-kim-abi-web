@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0F6B66">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Birikim Defteri</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E9EFF1;--surface:#fff;--ink:#12252D;--mute:#5B6E76;--line:#CBD7DB;--acc:#0F6B66;--acc-ink:#fff;--gold:#B8860B;--neg:#B3412E;--bar:#D5E1E4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1B20;--surface:#162830;--ink:#E6EEF0;--mute:#8FA5AD;--line:#27414B;--acc:#3FB6AB;--acc-ink:#06201E;--gold:#E0B84A;--neg:#E57A66;--bar:#223A44;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1B20;--surface:#162830;--ink:#E6EEF0;--mute:#8FA5AD;--line:#27414B;--acc:#3FB6AB;--acc-ink:#06201E;--gold:#E0B84A;--neg:#E57A66;--bar:#223A44;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:520px;margin:0 auto;padding:20px 16px 40px}
+.total{padding:8px 4px 20px}
+.total small{color:var(--mute);font-size:15px}
+.total .n{font-size:clamp(44px,14vw,68px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:2px 0 0}
+.total .n span{font-size:.5em;font-weight:600;color:var(--gold);margin-left:4px}
+.goal{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:15px}
+.bar{height:12px;border-radius:6px;background:var(--bar);margin:10px 0 6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--acc);border-radius:6px;transition:width .5s}
+.mute{color:var(--mute);font-size:14px}
+button.link{background:none;border:0;color:var(--acc);font:inherit;font-weight:600;padding:4px 0;cursor:pointer}
+.form{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:22px;display:grid;gap:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg.c4{grid-template-columns:repeat(4,1fr)}
+.seg button{padding:10px;border:0;background:transparent;color:var(--mute);font:inherit;font-weight:600;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink)}
+input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.add{padding:13px;border:0;border-radius:10px;background:var(--ink);color:var(--bg);font:inherit;font-weight:800;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+h2{font-size:17px;margin:0 4px 8px}
+ul{list-style:none;margin:0;padding:0}
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:14px}
+summary{font-weight:600;cursor:pointer}
+.rates{display:grid;gap:8px;margin-top:10px}
+.rates label{display:grid;grid-template-columns:1fr 130px;align-items:center;gap:8px;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chips span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:14px;font-weight:600}
+.warn{color:var(--neg);font-size:14px;margin:8px 0 0}
+.pl{font-size:16px;font-weight:600;margin:8px 0 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.pie{display:flex;align-items:center;gap:16px}
+.pie svg{width:132px;height:132px;flex:none;transform:rotate(-90deg)}
+.legend{flex:1;display:grid;gap:6px;font-size:15px}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:3px;flex:none}
+.legend b{margin-left:auto;font-variant-numeric:tabular-nums}
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chg>div{border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
+.chg small{display:block;color:var(--mute);font-size:13px}
+.chg b{display:block;font-size:18px;font-variant-numeric:tabular-nums}
+li{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid var(--line)}
+li .t{flex:1;min-width:0}
+li .t b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+li .a{font-weight:800;font-variant-numeric:tabular-nums}
+.pos{color:var(--acc)}.neg{color:var(--neg)}
+li button{background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer;padding:4px 8px}
+.empty{padding:22px 4px;color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+  <section class="total">
+    <small>Toplam birikim</small>
+    <p class="n" id="total">0<span>₺</span></p>
+    <div class="chips" id="chips"></div>
+    <p class="warn" id="warn"></p>
+    <p class="pl" id="pl"></p>
+    <div class="chips" id="plc"></div>
+  </section>
+
+  <details id="kzBox" hidden open>
+    <summary>Kâr/zarar değişimi</summary>
+    <div class="chg" id="kzGrid" style="margin-top:10px"></div>
+    <p class="mute" style="margin:10px 0 0;font-size:13px">Sadece kur farkından gelen kâr/zarar. Eklediğin veya çektiğin para buna dahil değil. Kurlar günlük kapanış verisidir.</p>
+  </details>
+
+  <details id="paBox" hidden>
+    <summary>Para ekleme</summary>
+    <div class="chg" id="paGrid" style="margin-top:10px"></div>
+    <p class="mute" style="margin:10px 0 0;font-size:13px">Seçilen dönemde eklediğin tutar (çektiğin eksi sayılır), eklendiği günün kuruyla ₺ değeri. Hediyeler de dahil, altında ayrıca gösterilir.</p>
+  </details>
+
+  <section class="card" id="pieBox" hidden>
+    <h2 style="margin:0 0 10px">Dağılım</h2>
+    <div class="pie"><svg id="pie" viewBox="0 0 42 42" role="img" aria-label="Birikim dağılımı"></svg><div class="legend" id="legend"></div></div>
+  </section>
+
+  <details id="ratesBox">
+    <summary>Kurlar (₺ karşılığı)</summary>
+    <div class="rates">
+      <label>1 $ kaç ₺<input id="rUSD" type="number" inputmode="decimal" min="0" step="0.0001" placeholder="ör. kendi kurun"></label>
+      <label>1 € kaç ₺<input id="rEUR" type="number" inputmode="decimal" min="0" step="0.0001" placeholder="ör. kendi kurun"></label>
+      <label>1 gr altın kaç ₺<input id="rXAU" type="number" inputmode="decimal" min="0" step="0.01" placeholder="ör. kendi fiyatın"></label>
+    </div>
+    <button class="link" id="rateBtn">Kurları güncelle</button>
+    <p class="mute" id="rateStat" style="margin:4px 0 0">Otomatik alınamazsa kurları elle girebilirsin.</p>
+  </details>
+
+  <section class="goal">
+    <div class="row"><b>Hedef</b><button class="link" id="goalBtn">Hedefi değiştir</button></div>
+    <div id="goalForm" style="display:none;gap:10px;margin-top:8px">
+      <div class="seg c4" role="group" aria-label="Hedef birimi">
+        <button data-g="TRY" aria-pressed="true">₺</button>
+        <button data-g="USD" aria-pressed="false">$</button>
+        <button data-g="EUR" aria-pressed="false">€</button>
+        <button data-g="XAU" aria-pressed="false">Altın</button>
+      </div>
+      <div class="two"><input id="goalAmt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Hedef miktar" aria-label="Hedef miktar"><button class="add" id="goalSave">Kaydet</button></div>
+    </div>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="row mute"><span id="goalTxt">Henüz hedef yok</span><span id="pct"></span></div>
+  </section>
+
+  <section class="form">
+    <div class="seg" role="group" aria-label="İşlem türü">
+      <button id="bIn" aria-pressed="true">Birikim ekle</button>
+      <button id="bOut" aria-pressed="false">Para çek</button>
+    </div>
+    <div class="seg c4" role="group" aria-label="Para birimi">
+      <button data-c="TRY" aria-pressed="true">₺</button>
+      <button data-c="USD" aria-pressed="false">$</button>
+      <button data-c="EUR" aria-pressed="false">€</button>
+      <button data-c="XAU" aria-pressed="false">Altın</button>
+    </div>
+    <div class="two">
+      <input id="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Miktar" aria-label="Tutar">
+      <input id="date" type="date" aria-label="Tarih">
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:15px"><input type="checkbox" id="gift" style="width:auto;margin:0"> Hediye / parayla alınmadı</label>
+    <input id="rate" type="number" inputmode="decimal" min="0" step="0.0001" placeholder="Alış kuru (₺)" aria-label="Alış kuru" hidden>
+    <p class="mute" id="rateInfo" style="display:none;margin:0"></p>
+    <input id="note" type="text" maxlength="60" placeholder="Not (ör. maaştan ayırdım)" aria-label="Not">
+    <button class="add" id="add">Kaydet</button>
+  </section>
+
+  <details id="bkBox">
+    <summary>Yedekle / geri yükle</summary>
+    <p class="mute" style="margin:8px 0">Güncellemeden önce "Yedeği kopyala"ya bas, metni Notlar gibi bir yere yapıştırıp sakla. Kayıtlar giderse metni aşağıdaki kutuya yapıştırıp "Geri yükle"ye bas.</p>
+    <textarea id="bkText" rows="4" aria-label="Yedek metni" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:13px;margin-bottom:10px"></textarea>
+    <div class="two"><button class="add" id="bkCopy">Yedeği kopyala</button><button class="add" id="bkRestore">Geri yükle</button></div>
+    <p class="mute" id="bkMsg" style="margin:8px 0 0"></p>
+    <p class="mute" id="diag" style="margin:8px 0 0;font-size:12px"></p>
+  </details>
+
+  <h2>Kayıtlar</h2>
+  <ul id="list"></ul>
+</main>
+
+<script>
+(function(){
+  var KEY='birikim-v1', S={items:[],goal:0,rates:{USD:0,EUR:0,XAU:0}}, kind='in', cur='TRY';
+  var $=function(i){return document.getElementById(i)};
+  var CS=['TRY','USD','EUR','XAU'];
+  var BAK=KEY+'-bak',VER='v10',storeOk=true;
+  function readKey(k){try{var raw=localStorage.getItem(k);if(!raw)return null;var p=JSON.parse(raw);return(p&&Array.isArray(p.items))?p:null}catch(e){return null}}
+  function adopt(p){S.items=p.items;S.goal=p.goal||0;S.goalCur=p.goalCur||'TRY';S.rates=Object.assign({USD:0,EUR:0,XAU:0},p.rates||{})}
+  var p0=readKey(KEY),recovered=false;
+  if(p0&&p0.items.length){adopt(p0)}
+  else{var pb=readKey(BAK);if(pb&&pb.items.length){adopt(pb);recovered=true}else if(p0){adopt(p0)}}
+  function save(){try{var js=JSON.stringify(S);localStorage.setItem(KEY,js);if(S.items.length)localStorage.setItem(BAK,js)}catch(e){storeOk=false}}
+  function fmt(n){return n.toLocaleString('tr-TR',{minimumFractionDigits:0,maximumFractionDigits:2})}
+  function show(c,n){var v=fmt(Math.abs(n));return c==='USD'?'$'+v:c==='EUR'?'€'+v:c==='XAU'?v+' gr altın':v+' ₺'}
+  function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+  $('date').value=today();
+  ['USD','EUR','XAU'].forEach(function(c){
+    var el=$('r'+c);if(S.rates[c])el.value=S.rates[c];
+    el.oninput=function(){var v=parseFloat(String(el.value).replace(',','.'));S.rates[c]=v>0?v:0;save();render()};
+  });
+  var PER=[['d','Günlük',1],['w','Haftalık',7],['m','Aylık',30],['y','Yıllık',365]],chgSeq=0,chgFail=0;
+  function dstr(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+  function dayAgo(n){var d=new Date();d.setDate(d.getDate()-n);return dstr(d)}
+  function sg(v){return (v>=0?'+':'−')+fmt(Math.abs(v))+' ₺'}
+  function mkGrid(id,pre){var g=$(id);PER.forEach(function(p){var d=document.createElement('div');d.innerHTML='<small>'+p[1]+'</small><b id="'+pre+'V-'+p[0]+'">…</b><small id="'+pre+'S-'+p[0]+'"></small>';g.appendChild(d)})}
+  mkGrid('kzGrid','kz');mkGrid('paGrid','pa');
+  function setCell(pre,k,ok,val,sub,colored,msg){
+    var v=$(pre+'V-'+k),s2=$(pre+'S-'+k);
+    if(!ok){v.textContent='—';v.className='';s2.textContent=msg||'';return}
+    v.textContent=sg(val);v.className=colored?(val>=0?'pos':'neg'):'';s2.textContent=sub||'';
+  }
+  function paintChange(hn,arr){
+    PER.forEach(function(p,i){
+      var T=dayAgo(p[2]),ht=arr[i],kzOk=true,paOk=true,vT=0,kz=0,add=0,gift=0;
+      S.items.forEach(function(x){
+        var c=x.cur||'TRY',tr=c==='TRY',rn=tr?1:(hn&&hn[c]),rt=tr?1:(ht&&ht[c]);
+        if(x.date<=T){
+          if(!(rn>0)||!(rt>0)){kzOk=false;return}
+          vT+=x.amt*rt;kz+=x.amt*(rn-rt);
+        }else{
+          var re=tr?1:(x.rate>0?x.rate:rn);
+          if(!(re>0)){paOk=false;return}
+          add+=x.amt*re;
+          if(x.gift&&x.amt>0)gift+=x.amt*re;
+          if(rn>0)kz+=x.amt*(rn-re);else kzOk=false;
+        }
+      });
+      var base=vT+add;
+      setCell('kz',p[0],kzOk,kz,base>0?'%'+(kz>=0?'+':'−')+fmt(Math.abs(kz/base*100)):'',true,'kur alınamadı');
+      setCell('pa',p[0],paOk,add,gift!==0?'hediye '+sg(gift):'',false,'kur bilinmiyor');
+    });
+  }
+  function renderChange(){
+    var kb=$('kzBox'),pb=$('paBox');
+    if(!S.items.length){kb.hidden=true;pb.hidden=true;return}
+    kb.hidden=false;pb.hidden=false;
+    var need=S.items.some(function(x){return (x.cur||'TRY')!=='TRY'});
+    var my=++chgSeq,nulls=PER.map(function(){return null});
+    if(!need){paintChange({},PER.map(function(){return {}}));return}
+    if(Date.now()-chgFail<60000){paintChange(null,nulls);return}
+    Promise.resolve().then(function(){
+      return Promise.all([getHist(today())].concat(PER.map(function(p){return getHist(dayAgo(p[2])).catch(function(){return null})})));
+    }).then(function(r){if(my!==chgSeq)return;paintChange(r[0],r.slice(1))})
+    .catch(function(){if(my!==chgSeq)return;chgFail=Date.now();paintChange(null,nulls)});
+  }
+  function fixGiftRates(){
+    var miss=S.items.filter(function(x){return x.gift&&(x.cur||'TRY')!=='TRY'&&!(x.rate>0)});
+    if(!miss.length)return;
+    Promise.resolve().then(function(){
+      return Promise.all(miss.map(function(x){return getHist(x.date).then(function(h){if(h[x.cur]>0)x.rate=h[x.cur]}).catch(function(){})}));
+    }).then(function(){save();render()}).catch(function(){});
+  }
+  function render(){
+    renderChange();
+    $('diag').textContent='Sürüm '+VER+' · kayıt: '+S.items.length+' · depolama: '+(storeOk?'tamam':'yazılamıyor')+' · adres: '+(location.host||'dosya')+(recovered?' · yedekten kurtarıldı':'');
+    var net={TRY:0,USD:0,EUR:0,XAU:0};
+    S.items.forEach(function(x){net[x.cur||'TRY']+=x.amt});
+    var total=net.TRY,miss=[];
+    ['USD','EUR','XAU'].forEach(function(c){
+      if(net[c]!==0){ if(S.rates[c]>0)total+=net[c]*S.rates[c]; else miss.push(c==='USD'?'$':c==='EUR'?'€':'altın'); }
+    });
+    $('total').innerHTML=fmt(total)+'<span>₺</span>';
+    var ch=$('chips');ch.innerHTML='';
+    CS.forEach(function(c){ if(net[c]!==0){var sp=document.createElement('span');sp.textContent=(net[c]<0?'−':'')+show(c,net[c]);ch.appendChild(sp)} });
+    $('warn').textContent=miss.length?'Toplama katılmadı, kur gir: '+miss.join(', '):'';
+    var plv=0,base=0,cnt=0,anyF=false,gp=0,pp0=0;
+    var byC={TRY:[0,0,0,0],USD:[0,0,0,0],EUR:[0,0,0,0],XAU:[0,0,0,0]};
+    S.items.forEach(function(x){var c=x.cur||'TRY',cr=c==='TRY'?1:S.rates[c];
+      if(c==='TRY')return;anyF=true;
+      if(x.rate>0&&cr>0){var q=x.amt*(cr-x.rate);plv+=q;pp0+=q;base+=x.amt*x.rate;cnt++;byC[c][0]+=q;byC[c][1]+=x.amt*x.rate;byC[c][2]++}});
+    var pe=$('pl');
+    if(cnt){pe.className='pl '+(plv>=0?'pos':'neg');pe.textContent='Kâr/zarar: '+(plv>=0?'+':'−')+fmt(Math.abs(plv))+' ₺'}
+    else if(anyF){pe.className='pl mute';pe.textContent='Kâr/zarar için alış kurunu gir ve güncel kuru ayarla.'}
+    else{pe.className='pl';pe.textContent=''}
+    var pbox=$('plc');pbox.innerHTML='';
+    ['TRY','USD','EUR','XAU'].forEach(function(c){var r=byC[c];if(!r[2])return;
+      var sp=document.createElement('span');sp.className=r[0]>=0?'pos':'neg';
+      var nmx=c==='TRY'?'TL':c==='USD'?'$':c==='EUR'?'€':'Altın';
+      var t2=nmx+' '+(r[0]>=0?'+':'−')+fmt(Math.abs(r[0]))+' ₺';
+      sp.textContent=t2;pbox.appendChild(sp);});
+    var vals=[net.TRY,net.USD*S.rates.USD,net.EUR*S.rates.EUR,net.XAU*S.rates.XAU].map(function(v){return v>0?v:0});
+    var sum=vals.reduce(function(a,b){return a+b},0);
+    var PC=['#2A9D8F','#4F7CD1','#8E6BC9','#E0A526'],PN=['₺','Dolar','Euro','Altın'];
+    var pie=$('pie'),lg=$('legend');pie.innerHTML='';lg.innerHTML='';
+    $('pieBox').hidden=!(sum>0);
+    if(sum>0){var off=0,NS='http://www.w3.org/2000/svg';
+      vals.forEach(function(v,i){if(!v)return;var pc=v/sum*100;
+        var c=document.createElementNS(NS,'circle');c.setAttribute('cx','21');c.setAttribute('cy','21');c.setAttribute('r','15.9155');c.setAttribute('fill','none');c.setAttribute('stroke',PC[i]);c.setAttribute('stroke-width','8');c.setAttribute('stroke-dasharray',pc+' '+(100-pc));c.setAttribute('stroke-dashoffset',-off);pie.appendChild(c);off+=pc;
+        var d=document.createElement('div'),sw=document.createElement('i'),nm=document.createElement('span'),bb=document.createElement('b');
+        sw.style.background=PC[i];nm.textContent=PN[i];bb.textContent='%'+fmt(Math.round(pc*10)/10);
+        d.appendChild(sw);d.appendChild(nm);d.appendChild(bb);lg.appendChild(d);
+      });}
+    if(S.goal>0){
+      var gc=S.goalCur||'TRY',gr=gc==='TRY'?1:S.rates[gc],tg=gr>0?total/gr:0;var pc=Math.max(0,Math.min(100,tg/S.goal*100));
+      $('fill').style.width=pc+'%';
+      $('pct').textContent='%'+Math.round(pc);
+      var left=S.goal-tg;
+      $('goalTxt').textContent=!(gr>0)?'Hedef birimi için kur gir':left>0?show(gc,S.goal)+' hedefe '+show(gc,left)+' kaldı':'Hedefe ulaştın: '+show(gc,S.goal);
+    }else{$('fill').style.width='0';$('pct').textContent='';$('goalTxt').textContent='Henüz hedef yok'}
+    var L=$('list');L.innerHTML='';
+    if(!S.items.length){L.innerHTML='<li class="empty">İlk birikimini yukarıdan ekle.</li>';return}
+    S.items.slice().sort(function(a,b){return b.date.localeCompare(a.date)||b.id-a.id}).forEach(function(x){
+      var c=x.cur||'TRY';
+      var li=document.createElement('li');
+      var d=new Date(x.date+'T00:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'});
+      var t=document.createElement('div');t.className='t';
+      var b=document.createElement('b');b.textContent=x.note||(x.amt>0?'Birikim':'Çekim');
+      var m=document.createElement('span');m.className='mute';m.textContent=d;
+      m.textContent=d+(x.gift?' · hediye':'')+(x.rate>0?' · kur '+fmt(x.rate):'');
+      t.appendChild(b);t.appendChild(m);
+      if(c!=='TRY'&&x.amt>0&&x.rate>0&&S.rates[c]>0){var pl=x.amt*(S.rates[c]-x.rate);var k=document.createElement('span');k.className=pl>=0?'pos':'neg';k.style.display='block';k.style.fontSize='14px';k.textContent='K/Z '+(pl>=0?'+':'−')+fmt(Math.abs(pl))+' ₺';t.appendChild(k)}
+      var a=document.createElement('span');a.className='a '+(x.amt>0?'pos':'neg');
+      a.textContent=(x.amt>0?'+':'−')+show(c,x.amt);
+      var del=document.createElement('button');del.textContent='×';del.setAttribute('aria-label','Kaydı sil');
+      del.onclick=function(){S.items=S.items.filter(function(y){return y.id!==x.id});if(!S.items.length){try{localStorage.removeItem(BAK)}catch(e){}}save();render()};
+      li.appendChild(t);li.appendChild(a);li.appendChild(del);L.appendChild(li);
+    });
+  }
+  function setRate(c,v){S.rates[c]=v;$('r'+c).value=v?+v.toFixed(c==='XAU'?2:4):''}
+  function tmo(p,ms){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error('zaman aşımı'))},ms)})])}
+  function fetchRates(){
+    var st=$('rateStat');st.textContent='Kurlar alınıyor…';
+    delete hist.latest;
+    return tmo(Promise.resolve().then(function(){return getHist(today())}),12000).then(function(h){
+      if(!(h.USD>0))throw new Error('kur verisi yok');
+      setRate('USD',h.USD);if(h.EUR>0)setRate('EUR',h.EUR);if(h.XAU>0)setRate('XAU',h.XAU);
+      return h.XAU>0;
+    }).catch(function(){
+      return tmo(Promise.resolve().then(function(){return fetch('https://open.er-api.com/v6/latest/USD')}).then(function(r){return r.json()}),12000).then(function(j){
+        var t=j&&j.rates&&j.rates.TRY,e=j&&j.rates&&j.rates.EUR;
+        if(!(t>0))throw new Error('kur verisi yok');
+        setRate('USD',t);if(e>0)setRate('EUR',t/e);
+        return false;
+      });
+    }).then(function(gold){
+      save();render();
+      st.textContent='Güncellendi: '+new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+(gold?'':' (altın alınamadı, elle gir)');
+    }).catch(function(e){
+      st.textContent='Kurlar alınamadı ('+String(e&&e.message||e).slice(0,50)+'). Elle girebilirsin.';
+    });
+  }
+  $('rateBtn').onclick=fetchRates;
+  var hist={},fillSeq=0;
+  function getHist(day){
+    var key=day>=today()?'latest':day;
+    if(hist[key])return Promise.resolve(hist[key]);
+    var urls=['https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@'+key+'/v1/currencies/usd.json','https://'+key+'.currency-api.pages.dev/v1/currencies/usd.json'];
+    function tryU(i){
+      if(i>=urls.length)return Promise.reject(new Error('yok'));
+      return fetch(urls[i]).then(function(r){if(!r.ok)throw new Error('http');return r.json()}).then(function(j){
+        var u=j&&j.usd,t=u&&u.try;if(!(t>0))throw new Error('veri');
+        var out={USD:t,EUR:(u.eur>0?t/u.eur:0),XAU:(u.xau>0?t/u.xau/31.1035:0)};hist[key]=out;return out;
+      }).catch(function(){return tryU(i+1)});
+    }
+    return tryU(0);
+  }
+  function fillRate(){
+    var ri=$('rate'),info=$('rateInfo');
+    ri.hidden=(cur==='TRY');
+    if(cur==='TRY'){info.style.display='none';return}
+    var day=$('date').value||today(),my=++fillSeq,c=cur;
+    info.style.display='block';info.textContent='Seçilen tarihin kuru alınıyor…';
+    Promise.resolve().then(function(){return getHist(day)}).then(function(h){
+      if(my!==fillSeq)return;
+      if(h[c]>0){ri.value=+h[c].toFixed(c==='XAU'?2:4);info.textContent=(day>=today()?'Güncel kur':day+' tarihli kur')+' dolduruldu, elle değiştirebilirsin.'}
+      else{ri.value='';info.textContent='Bu birim için o tarihin kuru bulunamadı, elle gir.'}
+    }).catch(function(){
+      if(my!==fillSeq)return;
+      ri.value='';info.textContent=day<'2024-03-02'?'2 Mart 2024 öncesi için otomatik kur yok, elle gir.':'Tarihli kur alınamadı, elle gir.';
+    });
+  }
+  $('date').addEventListener('change',fillRate);
+  function setKind(k){kind=k;$('bIn').setAttribute('aria-pressed',k==='in');$('bOut').setAttribute('aria-pressed',k==='out')}
+  $('bIn').onclick=function(){setKind('in')};
+  $('bOut').onclick=function(){setKind('out')};
+  Array.prototype.forEach.call(document.querySelectorAll('[data-c]'),function(btn){
+    btn.onclick=function(){cur=btn.getAttribute('data-c');var ri=$('rate');ri.hidden=(cur==='TRY');ri.value=(cur!=='TRY'&&S.rates[cur]>0)?+S.rates[cur].toFixed(cur==='XAU'?2:4):'';ri.placeholder=cur==='XAU'?'Alış fiyatı (₺/gr)':'Alış kuru (₺)';Array.prototype.forEach.call(document.querySelectorAll('[data-c]'),function(o){o.setAttribute('aria-pressed',o===btn)});fillRate()}
+  });
+  $('add').onclick=function(){
+    var v=parseFloat($('amt').value);
+    if(!(v>0)){$('amt').focus();return}
+    var rv=parseFloat(String($('rate').value).replace(',','.'));if(!(rv>0)&&($('date').value||today())>=today())rv=S.rates[cur]>0?S.rates[cur]:0;
+    var it={id:Date.now(),amt:kind==='in'?v:-v,cur:cur,date:$('date').value||today(),note:$('note').value.trim()};
+    if($('gift').checked&&kind==='in')it.gift=true;
+    if(cur!=='TRY'&&rv>0)it.rate=rv;
+    S.items.push(it);
+    $('amt').value='';$('note').value='';$('gift').checked=false;save();render();fillRate();
+  };
+  var gsel='TRY';
+  function setG(g){gsel=g;Array.prototype.forEach.call(document.querySelectorAll('[data-g]'),function(o){o.setAttribute('aria-pressed',o.getAttribute('data-g')===g)})}
+  Array.prototype.forEach.call(document.querySelectorAll('[data-g]'),function(o){o.onclick=function(){setG(o.getAttribute('data-g'))}});
+  $('goalBtn').onclick=function(){var f=$('goalForm');var op=f.style.display==='none';f.style.display=op?'grid':'none';if(op){setG(S.goalCur||'TRY');$('goalAmt').value=S.goal||''}};
+  $('goalSave').onclick=function(){var n=parseFloat(String($('goalAmt').value).replace(',','.'));S.goal=n>0?n:0;S.goalCur=gsel;save();render();$('goalForm').style.display='none'};
+  $('bkCopy').onclick=function(){
+    var tx=JSON.stringify(S),ta=$('bkText'),ok=false;ta.value=tx;ta.select();
+    try{ok=document.execCommand('copy')}catch(e){}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(tx).then(function(){$('bkMsg').textContent='Yedek kopyalandı. Bir yere yapıştırıp sakla.'},function(){$('bkMsg').textContent=ok?'Yedek kopyalandı. Bir yere yapıştırıp sakla.':'Otomatik kopyalanamadı, kutudaki metni elle kopyala.'});
+    }else{$('bkMsg').textContent=ok?'Yedek kopyalandı. Bir yere yapıştırıp sakla.':'Otomatik kopyalanamadı, kutudaki metni elle kopyala.'}
+  };
+  $('bkRestore').onclick=function(){
+    try{
+      var p=JSON.parse($('bkText').value);if(!p||!Array.isArray(p.items))throw new Error('yedek');
+      S.items=p.items;S.goal=p.goal||0;S.goalCur=p.goalCur||'TRY';S.rates=Object.assign({USD:0,EUR:0,XAU:0},p.rates||{});
+      ['USD','EUR','XAU'].forEach(function(c){$('r'+c).value=S.rates[c]||''});
+      save();render();$('bkMsg').textContent=p.items.length+' kayıt geri yüklendi.';
+    }catch(e){$('bkMsg').textContent='Yedek metni geçersiz. Kopyaladığın metnin tamamını yapıştır.'}
+  };
+  render();
+  fetchRates();
+  fixGiftRates();
+  try{if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&location.hostname!=='localhost')navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}
+})();
+</script>
+</body>
+</html>
